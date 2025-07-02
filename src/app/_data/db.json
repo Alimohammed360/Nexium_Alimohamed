@@ -1,0 +1,18 @@
+{
+    "conatct": [
+        {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@contact",
+            "userId": "1"
+        }
+    ],
+    "users": [
+        {
+            "id": 1,
+            "name": "John Doe",
+            "email": "user1@mail.com",
+            "password": "user123"
+        }
+    ]
+}
