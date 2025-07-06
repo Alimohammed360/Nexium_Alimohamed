@@ -15,7 +15,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({ isLoggedIn, handleAuth }) => 
                 ${
                     isLoggedIn
                         ? "bg-blue-900 text-white hover:bg-blue-800"
-                        : "bg-blue-700 text-white hover:bg-blue-800"
+                        : "bg-blue-900 text-white hover:bg-blue-800"
                 }
                 shadow-md
             `}
