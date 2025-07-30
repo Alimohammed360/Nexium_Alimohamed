@@ -24,13 +24,13 @@ export default function HomePage() {
     try {
       const res = await fetch('/api/history')
       const data = await res.json()
-      
+
       if (!res.ok) {
         console.error('❌ History API Error:', data)
         alert(`Error fetching history: ${data.error || 'Failed to fetch history'}`)
         return
       }
-      
+
       setHistory(data.history || [])
       setShowHistory(true)
     } catch (error) {
@@ -49,8 +49,15 @@ export default function HomePage() {
     })
   }, [])
 
+
+
   // 🧠 Handle tailoring
   const handleTailor = async () => {
+    const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resume, jobDesc }),
+    });
     setLoading(true)
     try {
       const res = await fetch('/api/tailor', {
@@ -60,7 +67,7 @@ export default function HomePage() {
       })
 
       const data = await res.json()
-      
+
       if (!res.ok) {
         console.error('❌ API Error:', data)
         const errorMessage = data.error || 'Failed to tailor resume'
@@ -73,12 +80,12 @@ export default function HomePage() {
       if (data.tailoredResume) {
         setTailored(data.tailoredResume)
         console.log('✅ Tailored resume received:', data.tailoredResume.substring(0, 100) + '...')
-        
+
         // Smooth scroll to the tailored result after a brief delay
         setTimeout(() => {
-          tailoredRef.current?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
+          tailoredRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
           })
         }, 100)
       } else {
@@ -120,12 +127,12 @@ export default function HomePage() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               📄 Your Resume
             </label>
-                          <textarea
-                placeholder="Paste your resume here..."
-                className="w-full h-64 border border-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition-all duration-200 text-gray-900 placeholder-gray-500"
-                onChange={(e) => setResume(e.target.value)}
-                value={resume}
-              />
+            <textarea
+              placeholder="Paste your resume here..."
+              className="w-full h-64 border border-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition-all duration-200 text-gray-900 placeholder-gray-500"
+              onChange={(e) => setResume(e.target.value)}
+              value={resume}
+            />
           </div>
 
           {/* Job Description Input */}
@@ -189,14 +196,14 @@ export default function HomePage() {
             </h3>
             <div className="space-y-6">
               {history && history.length > 0 ? (
-                                history.map((item, idx) => (
+                history.map((item, idx) => (
                   <div key={idx} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
                     <div className="flex items-center justify-between mb-4">
                       <p className="text-sm text-gray-500">
                         {new Date(item.createdAt).toLocaleString()}
                       </p>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div>
                         <p className="font-semibold text-gray-700 mb-2 flex items-center">
@@ -207,7 +214,7 @@ export default function HomePage() {
                           <pre className="whitespace-pre-wrap text-sm text-gray-700">{item.jobDesc}</pre>
                         </div>
                       </div>
-                      
+
                       <div>
                         <p className="font-semibold text-gray-700 mb-2 flex items-center">
                           <span className="mr-2">📄</span>
