@@ -1,4 +1,8 @@
 export async function POST(req: Request) {
+  console.log("📥 Request received in /api/tailor");
+  const webhookUrl = process.env.N8N_WEBHOOK_URL;
+  console.log("📦 N8N_WEBHOOK_URL:", webhookUrl); // server-side log
+
   try {
     // Parse incoming JSON
     const body = await req.json();
