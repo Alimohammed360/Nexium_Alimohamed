@@ -1,27 +1,26 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 
 export default function AuthCallbackPage() {
   const supabase = createClientComponentClient()
   const router = useRouter()
-  const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    const handleAuth = async () => {
-      const { data, error } = await supabase.auth.getSession()
-      if (data.session) {
-        // Successful login
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
         router.push('/')
       } else {
-        console.error('Session not found:', error)
         router.push('/login')
       }
-    }
+    })
 
-    handleAuth()
+    // Clean up the listener
+    return () => {
+      listener.subscription.unsubscribe()
+    }
   }, [])
 
   return (
