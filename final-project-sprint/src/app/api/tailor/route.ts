@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     // Send POST request to n8n webhook
     const response = await fetch(
-      "https://farhanlakha-122.app.n8n.cloud/webhook/resume-tailor",
+      webhookURL,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

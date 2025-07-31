@@ -53,11 +53,6 @@ export default function HomePage() {
 
   // 🧠 Handle tailoring
   const handleTailor = async () => {
-    const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resume, jobDesc }),
-    });
     setLoading(true)
     try {
       const res = await fetch('/api/tailor', {
