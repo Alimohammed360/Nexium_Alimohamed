@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: 'Missing resume or job description' }), { status: 400 });
     }
 
-    const webhookUrl = process.env.N8N_WEBHOOK_URL;
+    const webhookUrl = "https://farhanlakha-122.app.n8n.cloud/webhook/resume-tailor";
     console.log("📦 N8N_WEBHOOK_URL:", webhookUrl);
 
     if (!webhookUrl) {
