@@ -1,5 +1,5 @@
 export async function POST(req: Request) {
-  const webhookURL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL;
+  const webhookURL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://farhanlakha-122.app.n8n.cloud/webhook/resume-tailor";
 
   if (!webhookURL) {
     console.error("Missing N8N webhook URL in environment variables");
