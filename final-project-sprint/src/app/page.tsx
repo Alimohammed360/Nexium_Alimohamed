@@ -53,6 +53,8 @@ export default function HomePage() {
 
   // 🧠 Handle tailoring
   const handleTailor = async () => {
+    console.log("📦 N8N_WEBHOOK_URL:", process.env.N8N_WEBHOOK_URL);
+
     setLoading(true)
     try {
       const res = await fetch('/api/tailor', {
