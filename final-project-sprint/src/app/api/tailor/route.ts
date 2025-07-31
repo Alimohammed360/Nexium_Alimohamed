@@ -1,16 +1,6 @@
 export async function POST(req: Request) {
-  const webhookURL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://farhanlakha-122.app.n8n.cloud/webhook/resume-tailor";
-
-  if (!webhookURL) {
-    console.error("Missing N8N webhook URL in environment variables");
-    return new Response(
-      JSON.stringify({ error: "Server configuration error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
   try {
-    // Parse JSON body from request
+    // Parse incoming JSON
     const body = await req.json();
     console.log("📥 Incoming request body:", body);
 
@@ -19,89 +9,73 @@ export async function POST(req: Request) {
     // Basic validation
     if (!resume || !jobDesc) {
       return new Response(
-        JSON.stringify({ error: "Missing resume or job description" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: 'Missing resume or job description' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Get webhook URL from env variable
+    const webhookUrl = process.env.N8N_WEBHOOK_URL;
+    if (!webhookUrl) {
+      console.error("❌ N8N_WEBHOOK_URL is not defined in env");
+      return new Response(
+        JSON.stringify({ error: 'Server misconfiguration: missing N8N webhook URL' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     // Send POST request to n8n webhook
-    const response = await fetch(
-      webhookURL,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resume, jobDesc }),
-      }
-    );
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resume, jobDesc }),
+    });
 
     if (!response.ok) {
-      console.error("❌ n8n webhook error:", await response.text());
+      const errorText = await response.text();
+      console.error("❌ n8n webhook error:", errorText);
       return new Response(
-        JSON.stringify({ error: "n8n webhook call failed" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: 'n8n webhook call failed', details: errorText }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     const result = await response.json();
     console.log("✅ Response from n8n:", result);
 
-    // Check if the response contains the original resume data (which means n8n didn't process it)
-    if (result.resume && result.resume.name) {
-      console.error(
-        "❌ n8n returned original resume data instead of tailored version"
-      );
+    // Extract tailored content
+    let tailoredContent =
+      result.tailoredResume ||
+      result.data ||
+      result.result ||
+      result.output ||
+      (typeof result === 'string' ? result : null);
+
+    if (!tailoredContent) {
+      console.error("❌ Could not find tailored content in n8n response. Keys:", Object.keys(result));
       return new Response(
         JSON.stringify({
-          error:
-            "The AI service returned the original resume instead of a tailored version. Please check the n8n workflow configuration.",
-          debug: "n8n returned input data instead of processed output",
+          error: 'Invalid response format from AI service',
+          debug: `Available keys: ${Object.keys(result).join(', ')}`
         }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Try to extract the tailored content from various possible response structures
-    let tailoredContent = null;
-
-    if (result.tailoredResume) {
-      tailoredContent = result.tailoredResume;
-    } else if (result.data) {
-      tailoredContent = result.data;
-    } else if (result.result) {
-      tailoredContent = result.result;
-    } else if (result.output) {
-      tailoredContent = result.output;
-    } else if (typeof result === "string") {
-      tailoredContent = result;
-    } else {
-      console.error(
-        "❌ Could not find tailored content in response. Available keys:",
-        Object.keys(result)
-      );
-      return new Response(
-        JSON.stringify({
-          error: "Invalid response format from AI service",
-          debug: `Available keys: ${Object.keys(result).join(", ")}`,
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Return tailored resume from n8n
+    // Success
     return new Response(
-      JSON.stringify({
-        tailoredResume: tailoredContent,
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ tailoredResume: tailoredContent }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
+
   } catch (error: any) {
     console.error("❌ Server error in /api/tailor:", error);
     return new Response(
       JSON.stringify({
-        error: "Internal Server Error",
-        message: error.message,
+        error: 'Internal Server Error',
+        message: error.message || 'Unknown error',
       }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }
