@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function AuthCallbackPage() {
   const supabase = createClientComponentClient()
   const router = useRouter()
-  const [checked, setChecked] = useState(true)
+  const [checked, setChecked] = useState(false)
 
   useEffect(() => {
     const handleAuth = async () => {
