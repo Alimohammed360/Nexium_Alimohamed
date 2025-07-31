@@ -51,10 +51,7 @@ export default function HomePage() {
 
   // 🧠 Handle tailoring
   const handleTailor = async () => {
-<<<<<<< HEAD
     
-=======
->>>>>>> parent of 7e866b6 (Summary)
     setLoading(true)
     try {
       const res = await fetch('/api/tailor', {
