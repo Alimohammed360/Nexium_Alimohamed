@@ -72,9 +72,7 @@ export default function HomePage() {
       }
 
       if (data.tailoredResume) {
-        setTailored(data.tailoredResume)
-        console.log('✅ Tailored resume received:', data.tailoredResume.substring(0, 100) + '...')
-        
+        setTailored(data.tailoredResume)        
         // Smooth scroll to the tailored result after a brief delay
         setTimeout(() => {
           tailoredRef.current?.scrollIntoView({ 
